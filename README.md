@@ -25,7 +25,8 @@ This project was built to demonstrate proficiency in AI-assisted software develo
 
 ## 🎨 Design Process
 I used Stitch to visualize the app before writing a single line of code.
-![Design Mockup](design_mockup.png)
+![Design Mockup](design_mockup1.png)
+![Design Mockup](design_mockup2.png)
 
 ## 🛠 Tech Stack
 * **Language:** Swift 5
