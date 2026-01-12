@@ -38,7 +38,7 @@ I used Stitch to visualize the app before writing a single line of code.
 ## 🚀 Setup Instructions
 1.  Clone this repository.
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/DailyQuoteApp.git](https://github.com/YOUR_USERNAME/DailyQuoteApp.git)
+    git clone https://github.com/Princegawai007/DailyQuoteApp.git
     ```
 2.  Open `DailyQuoteApp.xcodeproj` in Xcode.
 3.  Wait for Swift Package dependencies to resolve (if any).
