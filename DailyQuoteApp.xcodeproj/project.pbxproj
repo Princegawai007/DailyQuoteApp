@@ -60,6 +60,13 @@
 			);
 			target = A39951672F15260400546BA2 /* DailyQuoteApp */;
 		};
+		A3F908662F16A77B00073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Secrets.swift,
+			);
+			target = A3BA3A582F1636840060C625 /* QuoteWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,6 +74,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A3F908602F166CE600073498 /* Exceptions for "DailyQuoteApp" folder in "DailyQuoteApp" target */,
+				A3F908662F16A77B00073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */,
 			);
 			path = DailyQuoteApp;
 			sourceTree = "<group>";

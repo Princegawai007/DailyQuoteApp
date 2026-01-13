@@ -87,10 +87,11 @@ import WidgetKit
 import SwiftUI
 import Supabase
 
-// 1. Config (Same as your main app)
-let widgetSupabaseUrl = URL(string: "https://ennmukyueddpkjtaijyv.supabase.co")!
-let widgetSupabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubm11a3l1ZWRkcGtqdGFpanl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODE4MjksImV4cCI6MjA4Mzg1NzgyOX0.Xm9CTVxkhdaLzdtQMdLjCUC5301JuJEPLEuMVbAsofU" // <--- PASTE YOUR KEY HERE AGAIN
-let supabase = SupabaseClient(supabaseURL: widgetSupabaseUrl, supabaseKey: widgetSupabaseKey)
+
+let url = Secrets.supabaseURL
+let key = Secrets.supabaseKey
+
+let supabase = SupabaseClient(supabaseURL: url, supabaseKey: key)
 
 // Model for Widget
 struct WidgetQuote: Decodable {
