@@ -1,48 +1,28 @@
-# DailyQuoteApp
-This project was built to demonstrate proficiency in AI-assisted software development.
+# QuoteVault - Daily Wisdom iOS App
 
-
-A minimalist, aesthetic iOS application that delivers daily wisdom. Built using **SwiftUI** and an **AI-first workflow**.
+A native iOS application built with **SwiftUI** and **Supabase** that delivers daily quotes, supports user authentication, and syncs favorites across devices. Built using an AI-assisted workflow.
 
 ## 📱 Features
-* **Daily Inspiration:** Fetches random quotes from the [ZenQuotes API](https://zenquotes.io/).
-* **Favorites Collection:** Save quotes to your personal collection (persisted locally).
-* **Share Wisdom:** Share quotes directly to Instagram, Messages, or other apps via the iOS Share Sheet.
-* **Calm Aesthetic:** A pastel peach/mint UI designed to reduce stress.
-
-## 🤖 AI Workflow & Tools
-This project was built to demonstrate proficiency in AI-assisted software development.
-
-**Tools Used:**
-* **Stitch (by Google):** Used to generate the "Calm Pastel" UI designs and initial HTML/CSS structure.
-* **Cursor (with Gemini 1.5 Pro):** Used as the primary IDE for writing SwiftUI code, refactoring MVVM logic, and debugging.
-
-**My Approach:**
-1.  **Design Generation:** I prompted Stitch for a "minimalist, calming mobile app screen with a pastel palette."
-2.  **Code Translation:** I used Cursor to transpile the web-based design from Stitch into native SwiftUI Views, ensuring pixel-perfect replication.
-3.  **Logic Implementation:** I used "Context Prompting" to instruct the AI to build a robust `QuoteService` (Async/Await) and `QuoteViewModel` (ObservableObject).
-4.  **AI Debugging:** When the custom Tab Bar covered the content, I used AI to analyze the view hierarchy and apply the correct padding and Z-Stack layering.
-
-## 🎨 Design Process
-I used Stitch to visualize the app before writing a single line of code.
-![Design Mockup](design_mockup1.png)
-![Design Mockup](design_mockup2.png)
+* **Daily Quotes:** Browse a curated collection of wisdom.
+* **Cloud Sync:** Favorites are saved to a Postgres database (Supabase) and sync across devices instantly.
+* **User Auth:** Secure Login/Sign Up via Email.
+* **Home Screen Widget:** View quotes directly from the home screen using WidgetKit.
+* **Social Sharing:** Generate beautiful quote cards to share on Instagram/WhatsApp using `ImageRenderer` (iOS 16+).
 
 ## 🛠 Tech Stack
-* **Language:** Swift 5
-* **Framework:** SwiftUI
+* **Frontend:** SwiftUI, WidgetKit, Combine
+* **Backend:** Supabase (PostgreSQL, Auth)
 * **Architecture:** MVVM (Model-View-ViewModel)
-* **Persistence:** UserDefaults (JSON Encoding)
-* **Networking:** URLSession (Async/Await)
 
-## 🚀 Setup Instructions
-1.  Clone this repository.
-    ```bash
-    git clone https://github.com/Princegawai007/DailyQuoteApp.git
-    ```
-2.  Open `DailyQuoteApp.xcodeproj` in Xcode.
-3.  Wait for Swift Package dependencies to resolve (if any).
-4.  Run on **iPhone 15 Pro Simulator** (iOS 16.0+).
+## 🤖 The AI Workflow
+This project was built to demonstrate how AI can accelerate native development.
+1.  **Architecture Design:** AI helped structure the MVVM pattern and define the Supabase database schema.
+2.  **Error Resolution:** Debugged complex "Purple warnings" (Main Thread issues) and Build errors using AI analysis of Xcode logs.
+3.  **Code Generation:** Boilerplate for `ImageRenderer` and Supabase `AuthService` was generated to speed up implementation.
+4.  **Refinement:** Implemented "Optimistic UI" for the Favorites button to ensure the app feels instant even on slow networks.
 
-## 📄 License
-Free to use for educational purposes.
+## 🚀 How to Run
+1.  Clone the repository.
+2.  Open `DailyQuoteApp.xcodeproj` in Xcode 15+.
+3.  Add your Supabase URL and Key in `SupabaseConfig.swift`.
+4.  Run on iPhone Simulator or Device (iOS 16.0+).
