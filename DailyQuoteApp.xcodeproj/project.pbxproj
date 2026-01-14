@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A3BA3A4E2F162AF10060C625 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A3BA3A4D2F162AF10060C625 /* Supabase */; };
 		A3BA3A5B2F1636840060C625 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3BA3A5A2F1636840060C625 /* WidgetKit.framework */; };
 		A3BA3A5D2F1636840060C625 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3BA3A5C2F1636840060C625 /* SwiftUI.framework */; };
 		A3BA3A6C2F1636870060C625 /* QuoteWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A3BA3A592F1636840060C625 /* QuoteWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		A3BA3A732F1636C60060C625 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A3BA3A722F1636C60060C625 /* Supabase */; };
+		A3F7F34F2F176BEA007F3F4C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A3F7F34E2F176BEA007F3F4C /* Supabase */; };
+		A3F7F3512F176C03007F3F4C /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A3F7F3502F176C03007F3F4C /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,10 +60,26 @@
 			);
 			target = A39951672F15260400546BA2 /* DailyQuoteApp */;
 		};
-		A3F908662F16A77B00073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */ = {
+		A3F908AD2F16F0A300073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Core/Secrets.swift,
+				Core/SupabaseConfig.swift,
+				Models/Collection.swift,
+				Models/Quote.swift,
+				Services/AuthService.swift,
+				Services/QuoteService.swift,
+				ViewModels/CollectionsViewModel.swift,
+				ViewModels/QuoteViewModel.swift,
+				Views/Components/AnimatedGradientView.swift,
+				Views/Components/ShareSheet.swift,
+				Views/Main/CollectionDetailView.swift,
+				Views/Main/HomeQuoteCard.swift,
+				Views/Main/SharePreviewView.swift,
+				Views/Main/ThemeManager.swift,
+				Views/Main/WidgetQuote.swift,
+				Views/QuoteCard.swift,
+				Views/Settings/SettingsView.swift,
 			);
 			target = A3BA3A582F1636840060C625 /* QuoteWidgetExtension */;
 		};
@@ -74,7 +90,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A3F908602F166CE600073498 /* Exceptions for "DailyQuoteApp" folder in "DailyQuoteApp" target */,
-				A3F908662F16A77B00073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */,
+				A3F908AD2F16F0A300073498 /* Exceptions for "DailyQuoteApp" folder in "QuoteWidgetExtension" target */,
 			);
 			path = DailyQuoteApp;
 			sourceTree = "<group>";
@@ -94,7 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3BA3A4E2F162AF10060C625 /* Supabase in Frameworks */,
+				A3F7F34F2F176BEA007F3F4C /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,7 +120,7 @@
 			files = (
 				A3BA3A5D2F1636840060C625 /* SwiftUI.framework in Frameworks */,
 				A3BA3A5B2F1636840060C625 /* WidgetKit.framework in Frameworks */,
-				A3BA3A732F1636C60060C625 /* Supabase in Frameworks */,
+				A3F7F3512F176C03007F3F4C /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,7 +177,7 @@
 			);
 			name = DailyQuoteApp;
 			packageProductDependencies = (
-				A3BA3A4D2F162AF10060C625 /* Supabase */,
+				A3F7F34E2F176BEA007F3F4C /* Supabase */,
 			);
 			productName = DailyQuoteApp;
 			productReference = A39951682F15260400546BA2 /* DailyQuoteApp.app */;
@@ -184,7 +200,7 @@
 			);
 			name = QuoteWidgetExtension;
 			packageProductDependencies = (
-				A3BA3A722F1636C60060C625 /* Supabase */,
+				A3F7F3502F176C03007F3F4C /* Supabase */,
 			);
 			productName = QuoteWidgetExtension;
 			productReference = A3BA3A592F1636840060C625 /* QuoteWidgetExtension.appex */;
@@ -573,12 +589,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A3BA3A4D2F162AF10060C625 /* Supabase */ = {
+		A3F7F34E2F176BEA007F3F4C /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A3BA3A4B2F162AC10060C625 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;
 		};
-		A3BA3A722F1636C60060C625 /* Supabase */ = {
+		A3F7F3502F176C03007F3F4C /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A3BA3A4B2F162AC10060C625 /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Supabase;

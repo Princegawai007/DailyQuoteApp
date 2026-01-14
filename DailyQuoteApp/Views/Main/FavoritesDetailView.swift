@@ -11,7 +11,7 @@
 //struct FavoritesListView: View {
 //    @ObservedObject var viewModel: QuoteViewModel
 //    @State private var searchText = ""
-//    
+//
 //    var filteredQuotes: [Quote] {
 //        if searchText.isEmpty {
 //            return viewModel.favoriteQuotes
@@ -21,13 +21,13 @@
 //            quote.author.localizedCaseInsensitiveContains(searchText)
 //        }
 //    }
-//    
+//
 //    var body: some View {
 //        ZStack {
 //            // Background
 //            Color(hex: "#f6f8f7")
 //                .ignoresSafeArea()
-//            
+//
 //            VStack(spacing: 0) {
 //                // Header Section
 //                VStack(alignment: .leading, spacing: 8) {
@@ -35,7 +35,7 @@
 //                        .font(.system(size: 36, weight: .heavy, design: .default))
 //                        .tracking(-0.5)
 //                        .foregroundColor(Color(hex: "#10221a"))
-//                    
+//
 //                    Text("Your daily dose of saved wisdom")
 //                        .font(.system(size: 14, weight: .medium, design: .default))
 //                        .foregroundColor(Color.gray.opacity(0.5))
@@ -44,14 +44,14 @@
 //                .padding(.horizontal, 24)
 //                .padding(.top, 48)
 //                .padding(.bottom, 16)
-//                
+//
 //                // Search Bar
 //                HStack(spacing: 12) {
 //                    Image(systemName: "magnifyingglass")
 //                        .foregroundColor(Color(hex: "#13ec92"))
 //                        .font(.system(size: 24))
 //                        .padding(.leading, 16)
-//                    
+//
 //                    TextField("Search quotes, authors...", text: $searchText)
 //                        .font(.system(size: 16, weight: .medium, design: .default))
 //                        .foregroundColor(Color(hex: "#0d1b16"))
@@ -68,7 +68,7 @@
 //                )
 //                .padding(.horizontal, 24)
 //                .padding(.bottom, 24)
-//                
+//
 //                // Quotes List
 //                ScrollView {
 //                    LazyVStack(spacing: 20) {
@@ -91,11 +91,11 @@
 //            }
 //        }
 //    }
-//    
+//
 //    private func shareQuote(_ quote: Quote) {
 //        let text = "\"\(quote.text)\" - \(quote.author)"
 //        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-//        
+//
 //        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
 //           let rootViewController = windowScene.windows.first?.rootViewController {
 //            rootViewController.present(activityVC, animated: true)
@@ -110,20 +110,20 @@
 //struct FavoritesListView: View {
 //    @ObservedObject var viewModel: QuoteViewModel
 //    @Environment(\.colorScheme) var colorScheme
-//    
+//
 //    // Sharing State
 ////    @State private var showShareSheet = false
 ////    @State private var sharedImage: UIImage?
 //    // Replace the old showShareSheet/sharedImage state with:
 //    @State private var shareItem: ShareableImage?
-//    
+//
 //    var body: some View {
 //        NavigationView {
 //            ZStack {
 //                // Background
 //                AnimatedGradientView()
 //                    .ignoresSafeArea()
-//                
+//
 //                if viewModel.favoriteQuotes.isEmpty {
 //                    VStack(spacing: 20) {
 //                        Image(systemName: "heart.slash")
@@ -142,25 +142,25 @@
 //                                        .font(.system(size: 18, weight: .medium, design: .serif))
 //                                        .foregroundColor(.primary)
 //                                        .multilineTextAlignment(.leading)
-//                                    
+//
 //                                    // Author & Category
 //                                    HStack {
 //                                        Text("- \(quote.author)")
 //                                            .font(.caption)
 //                                            .italic()
 //                                            .foregroundColor(.secondary)
-//                                        
+//
 //                                        Spacer()
-//                                        
+//
 //                                        Text(quote.category.uppercased())
 //                                            .font(.caption2)
 //                                            .fontWeight(.bold)
 //                                            .foregroundColor(.gray.opacity(0.6))
 //                                    }
-//                                    
+//
 //                                    Divider()
 //                                        .background(Color.gray.opacity(0.3))
-//                                    
+//
 //                                    // Action Buttons
 //                                    HStack {
 //                                        Button(action: {
@@ -172,9 +172,9 @@
 //                                                .font(.caption)
 //                                                .foregroundColor(.red)
 //                                        }
-//                                        
+//
 //                                        Spacer()
-//                                        
+//
 //                                        // ⭐️ NEW: Share Image Button
 //                                        Button(action: {
 //                                            generateAndShareImage(for: quote)
@@ -212,7 +212,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    // 🎨 Helper: Create the Card View specifically for the Image Renderer
 //    // We force this to look "Light Mode" and clean so it looks good on Instagram/WhatsApp
 //    func renderView(for quote: Quote) -> some View {
@@ -220,24 +220,24 @@
 //            Image(systemName: "quote.opening")
 //                .font(.largeTitle)
 //                .foregroundColor(.green.opacity(0.6))
-//            
+//
 //            Text("\"\(quote.content)\"")
 //                .font(.system(size: 30, weight: .medium, design: .serif))
 //                .multilineTextAlignment(.center)
 //                .foregroundColor(.black) // Always black text for the image
 //                .padding()
-//            
+//
 //            Text("- \(quote.author)")
 //                .font(.headline)
 //                .italic()
 //                .foregroundColor(.gray)
-//            
+//
 //            Text(quote.category.uppercased())
 //                .font(.caption2)
 //                .fontWeight(.bold)
 //                .foregroundColor(.gray.opacity(0.4))
 //                .padding(.top, 10)
-//            
+//
 //            Text("Shared via QuoteVault")
 //                .font(.caption2)
 //                .foregroundColor(.gray.opacity(0.3))
@@ -253,10 +253,10 @@
 ////    private func generateAndShareImage(for quote: Quote) {
 ////        if #available(iOS 16.0, *) {
 ////            let viewToRender = renderView(for: quote)
-////            
+////
 ////            let renderer = ImageRenderer(content: viewToRender)
 ////            renderer.scale = UIScreen.main.scale
-////            
+////
 ////            if let image = renderer.uiImage {
 ////                self.sharedImage = image
 ////                self.showShareSheet = true
@@ -294,13 +294,13 @@
 //struct FavoritesListView: View {
 //    // Using StateObject to manage data
 //    @StateObject private var viewModel = QuoteViewModel()
-//    
+//
 //    // Search State
 //    @State private var searchText = ""
-//    
+//
 //    // Sharing State
 //    @State private var shareItem: ShareableImage?
-//    
+//
 //    var body: some View {
 //        NavigationView {
 //            ZStack {
@@ -309,18 +309,18 @@
 //                // If not, replace with: LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)]), startPoint: .topLeading, endPoint: .bottomTrailing)
 //                AnimatedGradientView()
 //                    .ignoresSafeArea()
-//                
+//
 //                VStack(spacing: 20) {
 //                    // 2. Custom Header & Search
 //                    VStack(alignment: .leading, spacing: 10) {
 //                        Text("My Collection")
 //                            .font(.system(size: 34, weight: .bold))
 //                            .foregroundColor(.primary)
-//                        
+//
 //                        Text("Your daily dose of saved wisdom")
 //                            .font(.subheadline)
 //                            .foregroundColor(.secondary)
-//                        
+//
 //                        // Search Bar
 //                        HStack {
 //                            Image(systemName: "magnifyingglass")
@@ -334,7 +334,7 @@
 //                    }
 //                    .padding(.horizontal)
 //                    .padding(.top, 10)
-//                    
+//
 //                    // 3. The List of Favorites
 //                    if filteredQuotes.isEmpty {
 //                        Spacer()
@@ -376,7 +376,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    // Logic to filter quotes
 //    var filteredQuotes: [Quote] {
 //        if searchText.isEmpty {
@@ -388,7 +388,7 @@
 //            }
 //        }
 //    }
-//    
+//
 //    // 📸 Snapshot Logic (Same as before)
 //    @available(iOS 16.0, *)
 //    @MainActor
@@ -401,7 +401,7 @@
 //            self.shareItem = ShareableImage(image: image)
 //        }
 //    }
-//    
+//
 //    func renderView(for quote: Quote) -> some View {
 //        VStack(spacing: 20) {
 //            Image(systemName: "quote.opening")
@@ -421,7 +421,7 @@
 //    let quote: Quote
 //    @ObservedObject var viewModel: QuoteViewModel
 //    var onShare: () -> Void
-//    
+//
 //    var body: some View {
 //        VStack(alignment: .leading, spacing: 15) {
 //            HStack(alignment: .top) {
@@ -429,15 +429,15 @@
 //                Image(systemName: "quote.opening")
 //                    .font(.title3)
 //                    .foregroundColor(Color.green.opacity(0.3))
-//                
+//
 //                Text(quote.content)
 //                    .font(.system(size: 18, weight: .medium, design: .serif))
 //                    .foregroundColor(.primary)
 //                    .lineLimit(nil)
 //                    .fixedSize(horizontal: false, vertical: true)
-//                
+//
 //                Spacer()
-//                
+//
 //                // Heart Icon
 //                Button(action: {
 //                    withAnimation { viewModel.toggleFavorite(quote) }
@@ -447,9 +447,9 @@
 //                        .font(.title3)
 //                }
 //            }
-//            
+//
 //            Divider().background(Color.gray.opacity(0.1))
-//            
+//
 //            HStack {
 //                // Author Initials Circle
 //                HStack(spacing: 8) {
@@ -462,14 +462,14 @@
 //                            .fontWeight(.bold)
 //                            .foregroundColor(.green)
 //                    }
-//                    
+//
 //                    Text(quote.author)
 //                        .font(.subheadline)
 //                        .foregroundColor(.secondary)
 //                }
-//                
+//
 //                Spacer()
-//                
+//
 //                // Share Button
 //                Button(action: onShare) {
 //                    Image(systemName: "square.and.arrow.up")
@@ -482,7 +482,7 @@
 //        .cornerRadius(16)
 //        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
 //    }
-//    
+//
 //    func getInitials(name: String) -> String {
 //        let parts = name.components(separatedBy: " ")
 //        if let first = parts.first?.prefix(1), let last = parts.last?.prefix(1) {
@@ -499,8 +499,9 @@
 import SwiftUI
 import UIKit
 
-struct FavoritesListView: View {
-    @StateObject private var viewModel = QuoteViewModel()
+struct FavoritesDetailView: View {
+    //    @StateObject private var viewModel = QuoteViewModel()
+    @ObservedObject var viewModel: QuoteViewModel
     @State private var searchText = ""
     @State private var shareItem: ShareableImage?
     
@@ -628,6 +629,11 @@ struct FavoriteCard: View {
     var fontSize: Double
     var onShare: () -> Void
     
+    // --- ADDED STATES FOR SHARE ---
+    @State private var showShareOptions = false
+    @State private var showSharePreview = false
+    @State private var shareItem: ShareableImage?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             HStack(alignment: .top) {
@@ -635,7 +641,6 @@ struct FavoriteCard: View {
                     .font(.title3)
                     .foregroundColor(Color.green.opacity(0.3))
                 
-                // Dynamic Font Size + Serif
                 Text(quote.content)
                     .font(.system(size: fontSize, weight: .medium, design: .serif))
                     .foregroundColor(.primary)
@@ -672,9 +677,29 @@ struct FavoriteCard: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                Button(action: onShare) {
+                
+                // --- UPDATED SHARE BUTTON ACTION ---
+                // --- UPDATED SHARE BUTTON WITH ANCHORED DIALOG ---
+                Button(action: { showShareOptions = true }) {
                     Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.green)
+                }
+                // Attach the dialog HERE so it anchors to this button
+                .confirmationDialog("Share Quote", isPresented: $showShareOptions, titleVisibility: .visible) {
+                    Button("Share as Text") {
+                        shareAsText(quote: quote)
+                    }
+                    Button("Share as Image Card") {
+                        showSharePreview = true
+                    }
+                    Button("Cancel", role: .cancel) { }
+                }
+                // Sheets can remain here or move to the outer VStack
+                .sheet(isPresented: $showSharePreview) {
+                    SharePreviewView(quote: quote, shareItem: $shareItem)
+                }
+                .sheet(item: $shareItem) { item in
+                    ShareSheet(items: [item.image])
                 }
             }
         }
@@ -682,6 +707,17 @@ struct FavoriteCard: View {
         .background(Color(uiColor: .systemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
+    }
+    
+    // --- HELPER FUNCTION ---
+    private func shareAsText(quote: Quote) {
+        let textToShare = "“\(quote.content)” — \(quote.author)\n\nShared via Daily Wisdom"
+        let av = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(av, animated: true, completion: nil)
+        }
     }
     
     func getInitials(name: String) -> String {

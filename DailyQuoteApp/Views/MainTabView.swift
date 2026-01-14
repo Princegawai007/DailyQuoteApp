@@ -106,22 +106,41 @@ import SwiftUI
 struct MainTabView: View {
     // We don't need to hold the ViewModel here anymore
     // Each view manages its own data
-    
+    @StateObject private var quoteViewModel = QuoteViewModel()
     var body: some View {
+//        TabView {
+//            // Tab 1: Home Feed
+//            QuoteDisplayView() // ✅ FIX: No arguments passed here
+//                .tabItem {
+//                    Label("Daily Wisdom", systemImage: "quote.bubble.fill")
+//                }
+//            
+//            // Tab 2: Favorites
+//            FavoritesListView()
+//                .tabItem {
+//                    Label("Favorites", systemImage: "heart.fill")
+//                }
+//            
+//            // Tab 3: Settings (Profile is inside here now)
+//            SettingsView()
+//                .tabItem {
+//                    Label("Settings", systemImage: "gear")
+//                }
+//        }
         TabView {
-            // Tab 1: Home Feed
-            QuoteDisplayView() // ✅ FIX: No arguments passed here
+            QuoteDisplayView(viewModel: quoteViewModel)
                 .tabItem {
-                    Label("Daily Wisdom", systemImage: "quote.bubble.fill")
+                    Label("Quotes", systemImage: "quote.bubble")
                 }
-            
-            // Tab 2: Favorites
-            FavoritesListView()
-                .tabItem {
-                    Label("Favorites", systemImage: "heart.fill")
-                }
-            
-            // Tab 3: Settings (Profile is inside here now)
+
+            // UPDATE THIS TAB:
+            NavigationView {
+                LibraryView(quotesVM: quoteViewModel) // Pass your shared ViewModel
+            }
+            .tabItem {
+                Label("Library", systemImage: "books.vertical")
+            }
+
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")

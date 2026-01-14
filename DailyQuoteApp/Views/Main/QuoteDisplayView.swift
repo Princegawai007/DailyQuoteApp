@@ -949,7 +949,7 @@
 import SwiftUI
 
 struct QuoteDisplayView: View {
-    @StateObject private var viewModel = QuoteViewModel()
+    @ObservedObject var viewModel: QuoteViewModel
     
     // 1. Connect to the global font size setting
     @AppStorage("fontSize") private var fontSize: Double = 21.0
@@ -1006,8 +1006,7 @@ struct QuoteDisplayView: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity)
-                            // CHANGED: Pure Black in Dark Mode
-                            .background(Color(uiColor: .systemBackground))
+                            .background(Color(uiColor: .secondarySystemGroupedBackground)) // Adaptive Card
                             .cornerRadius(20)
                             .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
                             .padding(40)
@@ -1015,6 +1014,15 @@ struct QuoteDisplayView: View {
                         } else {
                             ScrollView {
                                 LazyVStack(spacing: 20) {
+                                    if let dailyQuote = viewModel.quoteOfTheDay {
+                                            DailyHeroSection(quote: dailyQuote, viewModel: viewModel, fontSize: fontSize)
+                                                .padding(.bottom, 10)
+                                            
+                                            Divider()
+                                                .padding(.horizontal)
+                                                .padding(.bottom, 10)
+                                        }
+
                                     ForEach(viewModel.quotes) { quote in
                                         // Pass fontSize to the card
                                         HomeQuoteCard(quote: quote, viewModel: viewModel, fontSize: fontSize)
@@ -1030,16 +1038,62 @@ struct QuoteDisplayView: View {
                                 }
                                 .padding()
                                 .padding(.bottom, 20)
+                                
+                                // --- QUOTE OF THE DAY SECTION ---
+                                if let dailyQuote = viewModel.quoteOfTheDay {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        HStack {
+                                            Image(systemName: "sparkles")
+                                                .foregroundColor(.yellow)
+                                            Text("QUOTE OF THE DAY")
+                                                .font(.system(size: 14, weight: .black))
+                                                .foregroundColor(.secondary)
+                                        }
+                                        .padding(.horizontal)
+
+                                        HomeQuoteCard(quote: dailyQuote, viewModel: viewModel, fontSize: fontSize + 2)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .stroke(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
+                                            )
+                                            .shadow(color: .yellow.opacity(0.2), radius: 10)
+                                    }
+                                    .padding(.bottom, 10)
+                                    
+                                    Divider()
+                                        .padding(.horizontal)
+                                        .padding(.bottom, 10)
+                                }
+                                // --------------------------------
                             }
                             .refreshable {
+                                await viewModel.fetchQuoteOfTheDay() // Add this
                                 await viewModel.fetchQuotes(loadMore: false)
+                                
                             }
                         }
                     }
                 }
+                .onAppear {
+                    Task {
+                        await viewModel.fetchQuoteOfTheDay() // Fetches the hero quote
+                        await viewModel.fetchQuotes(loadMore: false) // Fetches the feed
+                        await viewModel.fetchBookmarkedStatus()
+                         viewModel.refreshBookmarks()
+                    }
+                }
+//                .navigationTitle("Daily Wisdom")
+//                .navigationBarTitleDisplayMode(.inline)
+//                .toolbarBackground(.hidden, for: .navigationBar)
                 .navigationTitle("Daily Wisdom")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(.hidden, for: .navigationBar)
+//                .toolbar {
+//                    ToolbarItem(placement: .navigationBarTrailing) {
+//                        NavigationLink(destination: CollectionsListView()) {
+//                            Image(systemName: "folder")
+//                                .foregroundColor(.primary)
+//                        }
+//                    }
+//                }
             } else {
                 // Fallback for older iOS
                 Text("Requires iOS 16+")
@@ -1074,12 +1128,16 @@ struct CategoryPill: View {
 struct HomeQuoteCard: View {
     let quote: Quote
     @ObservedObject var viewModel: QuoteViewModel
+    @State private var showShareOptions = false
+    @State private var showSharePreview = false
     
     // Receive dynamic font size
     var fontSize: Double
     
+    // States for sheets
     @State private var shareItem: ShareableImage?
     @State private var showTextShareSheet = false
+    @State private var showAddToCollectionSheet = false // <--- NEW STATE
     
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
@@ -1104,6 +1162,7 @@ struct HomeQuoteCard: View {
             
             // Actions
             HStack {
+                // 1. LIKE BUTTON
                 Button(action: {
                     let impactMed = UIImpactFeedbackGenerator(style: .medium)
                     impactMed.impactOccurred()
@@ -1111,38 +1170,98 @@ struct HomeQuoteCard: View {
                         viewModel.toggleFavorite(quote)
                     }
                 }) {
-                    // Green Heart logic
                     Image(systemName: viewModel.isFavorite(quote) ? "heart.fill" : "heart")
                         .font(.system(size: 20))
-                        .foregroundColor(viewModel.isFavorite(quote) ? .green : .gray)
+                        .foregroundColor(viewModel.isFavorite(quote) ? .green : .green)
                 }
+                
+                // 2. SAVE TO COLLECTION BUTTON (NEW)
+                Button(action: {
+                    showAddToCollectionSheet = true
+                }) {
+                    // Check if this quote's ID is in our bookmarked list
+                    Image(systemName: viewModel.bookmarkedQuoteIds.contains(quote.id ?? -1) ? "bookmark.fill" : "bookmark")
+                        .font(.system(size: 20))
+                        // Change color to Blue (or your preference) when filled
+                        .foregroundColor(viewModel.bookmarkedQuoteIds.contains(quote.id ?? -1) ? .green : .green)
+                }
+                .padding(.leading, 20) // Space between Heart and Bookmark
                 
                 Spacer()
                 
-                Button(action: { generateAndShareImage() }) {
+                // 3. SHARE BUTTON
+//                Button(action: { generateAndShareImage() }) {
+//                    Image(systemName: "square.and.arrow.up")
+//                        .font(.system(size: 20))
+//                        .foregroundColor(.gray)
+//                }
+                // 3. SHARE BUTTON
+                Button(action: {
+                    showShareOptions = true
+                }) {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: 20))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.green)
+                }
+                .confirmationDialog("Share Quote", isPresented: $showShareOptions, titleVisibility: .visible) {
+                    Button("Share as Text") {
+                        shareAsText(quote: quote)
+                    }
+                    Button("Share as Image Card") {
+                        showSharePreview = true // This opens the 3-template picker
+                    }
+                    Button("Cancel", role: .cancel) { }
+                }
+                // Keep the sheet attached to the button or the VStack
+                .sheet(isPresented: $showSharePreview) {
+                    SharePreviewView(quote: quote, shareItem: $shareItem)
                 }
             }
         }
         .padding(20)
-        // CHANGED: Pure Black in Dark Mode
+        // Adaptive Background: White in Light, Dark Grey in Dark
+//        .background(Color(uiColor: .secondarySystemGroupedBackground))
+//        .background(Color.black) // This makes it OLED Black
         .background(Color(uiColor: .systemBackground))
+        // Note: In Dark Mode, .systemBackground is pure black on most iOS devices.
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 4)
+        // --- SHEETS ---
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.image])
         }
         .sheet(isPresented: $showTextShareSheet) {
             ShareSheet(items: ["“\(quote.content)” - \(quote.author)"])
         }
+        // New Sheet for Collections
+//        .sheet(isPresented: $showAddToCollectionSheet) {
+//            if #available(iOS 16.0, *) {
+//                AddToCollectionView(quoteId: quote.id)
+//                    .presentationDetents([.medium, .large]) // Nice half-sheet effect
+//            } else {
+//                AddToCollectionView(quoteId: quote.id)
+//            }
+//        }
+        // ... inside HomeQuoteCard ...
+
+        .sheet(isPresented: $showAddToCollectionSheet) {
+            if let quoteId = quote.id {
+                // Pass BOTH the quoteId and the viewModel
+                if #available(iOS 16.0, *) {
+                    AddToCollectionView(quoteId: quoteId, quotesVM: viewModel)
+                        .presentationDetents([.medium, .large])
+                } else {
+                    // Fallback on earlier versions
+                }
+            }
+        }
     }
     
     @MainActor
     private func generateAndShareImage() {
         if #available(iOS 16.0, *) {
-            let viewToRender = renderView(for: quote)
+            // Change  to .minimal (default)
+            let viewToRender = renderView(for: quote, theme: .minimal)
             let renderer = ImageRenderer(content: viewToRender)
             renderer.scale = UIScreen.main.scale
             if let image = renderer.uiImage {
@@ -1153,34 +1272,117 @@ struct HomeQuoteCard: View {
         }
     }
     
+//    MARK: OLD WAY OF SHOWING BACKGROUND CARD
+    
     // NOTE: The Render View stays explicitly White/Black because generated images
     // usually look best on white regardless of the user's phone theme.
-    private func renderView(for quote: Quote) -> some View {
+//    private func renderView(for quote: Quote) -> some View {
+//        VStack(spacing: 20) {
+//            Image(systemName: "quote.opening")
+//                .font(.largeTitle)
+//                .foregroundColor(.green.opacity(0.6))
+//            Text("“\(quote.content)”")
+//                .font(.system(size: 30, weight: .medium, design: .serif))
+//                .multilineTextAlignment(.center)
+//                .foregroundColor(.black)
+//                .padding()
+//            Text("- \(quote.author)")
+//                .font(.system(.headline, design: .serif))
+//                .italic()
+//                .foregroundColor(.gray)
+//            Text(quote.category.uppercased())
+//                .font(.system(.caption2, design: .serif))
+//                .fontWeight(.bold)
+//                .foregroundColor(.gray.opacity(0.4))
+//                .padding(.top, 10)
+//            Text("Shared via QuoteVault")
+//                .font(.system(.caption2, design: .serif))
+//                .foregroundColor(.gray.opacity(0.3))
+//                .padding(.top, 20)
+//        }
+//        .frame(width: 350, height: 450)
+//        .background(Color.white)
+//        .cornerRadius(20)
+//    }
+    
+//    MARK: NEW WAY FOR ADDING BACKGROUD
+    
+//    private func renderView(for quote: Quote) -> some View {
+//        VStack(spacing: 20) {
+//            Image(systemName: "quote.opening")
+//                .font(.largeTitle)
+//                .foregroundColor(.white.opacity(0.6)) // White for contrast
+//            
+//            Text("“\(quote.content)”")
+//                .font(.system(size: 28, weight: .bold, design: .serif))
+//                .multilineTextAlignment(.center)
+//                .foregroundColor(.white) // White text
+//                .padding()
+//            
+//            Text("- \(quote.author)")
+//                .font(.system(.headline, design: .serif))
+//                .italic()
+//                .foregroundColor(.white.opacity(0.8))
+//                
+//            Text("Shared via Daily Wisdom")
+//                .font(.caption2)
+//                .foregroundColor(.white.opacity(0.5))
+//        }
+//        .frame(width: 400, height: 400)
+//        // ADD THE STYLED BACKGROUND HERE:
+//        .background(
+//            LinearGradient(colors: [.indigo, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+//        )
+//    }
+    private func renderView(for quote: Quote, theme: QuoteTheme) -> some View {
         VStack(spacing: 20) {
-            Image(systemName: "quote.opening")
-                .font(.largeTitle)
-                .foregroundColor(.green.opacity(0.6))
             Text("“\(quote.content)”")
-                .font(.system(size: 30, weight: .medium, design: .serif))
+                .font(.system(size: 32, weight: .bold, design: .serif))
+                .foregroundColor(theme.textColor)
                 .multilineTextAlignment(.center)
-                .foregroundColor(.black)
                 .padding()
+
             Text("- \(quote.author)")
-                .font(.system(.headline, design: .serif))
-                .italic()
-                .foregroundColor(.gray)
-            Text(quote.category.uppercased())
-                .font(.system(.caption2, design: .serif))
-                .fontWeight(.bold)
-                .foregroundColor(.gray.opacity(0.4))
-                .padding(.top, 10)
-            Text("Shared via QuoteVault")
-                .font(.system(.caption2, design: .serif))
-                .foregroundColor(.gray.opacity(0.3))
-                .padding(.top, 20)
+                .font(.headline)
+                .foregroundColor(theme.textColor.opacity(0.8))
         }
-        .frame(width: 350, height: 450)
-        .background(Color.white)
-        .cornerRadius(20)
+        .frame(width: 400, height: 400)
+        .background(LinearGradient(colors: theme.backgroundColors , startPoint: .top, endPoint: .bottom))
+    }
+    private func shareAsText(quote: Quote) {
+        let textToShare = "“\(quote.content)” — \(quote.author)\n\nShared via Daily Wisdom"
+        let av = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+        
+        // Finding the root view controller to present the share sheet
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(av, animated: true, completion: nil)
+        }
+    }
+}
+// This is the missing piece that was causing your error!
+struct DailyHeroSection: View {
+    let quote: Quote
+    @ObservedObject var viewModel: QuoteViewModel
+    var fontSize: Double
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundColor(.yellow)
+                Text("QUOTE OF THE DAY")
+                    .font(.system(size: 14, weight: .black))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal)
+
+            HomeQuoteCard(quote: quote, viewModel: viewModel, fontSize: fontSize + 2)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
+                )
+                .shadow(color: .yellow.opacity(0.2), radius: 10)
+        }
     }
 }

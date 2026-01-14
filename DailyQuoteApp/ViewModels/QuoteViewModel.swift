@@ -179,6 +179,8 @@ import Foundation
 import SwiftUI
 import Combine
 internal import Auth
+internal import PostgREST
+import Supabase
 
 @MainActor
 class QuoteViewModel: ObservableObject {
@@ -187,6 +189,8 @@ class QuoteViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var favoriteQuotes: [Quote] = []
+    @Published var quoteOfTheDay: Quote?
+    @Published var bookmarkedQuoteIds: Set<Int> = []
     
     // Category Filter
     @Published var selectedCategory: String = "All"
@@ -284,24 +288,93 @@ class QuoteViewModel: ObservableObject {
         }
     }
     
+//    func toggleFavorite(_ quote: Quote) {
+//        guard let userId = authService.userSession?.user.id,
+//              let quoteId = quote.id else { return }
+//        
+//        if isFavorite(quote) {
+//            favoriteQuotes.removeAll { $0.id == quote.id }
+//            Task.detached(priority: .userInitiated) {
+//                try? await QuoteService.shared.removeFavorite(quoteId: quoteId, userId: userId)
+//            }
+//        } else {
+//            favoriteQuotes.append(quote)
+//            Task.detached(priority: .userInitiated) {
+//                try? await QuoteService.shared.addFavorite(quoteId: quoteId, userId: userId)
+//            }
+//        }
+//    }
     func toggleFavorite(_ quote: Quote) {
         guard let userId = authService.userSession?.user.id,
               let quoteId = quote.id else { return }
         
-        if isFavorite(quote) {
-            favoriteQuotes.removeAll { $0.id == quote.id }
-            Task.detached(priority: .userInitiated) {
-                try? await QuoteService.shared.removeFavorite(quoteId: quoteId, userId: userId)
-            }
-        } else {
-            favoriteQuotes.append(quote)
-            Task.detached(priority: .userInitiated) {
-                try? await QuoteService.shared.addFavorite(quoteId: quoteId, userId: userId)
+        // Use withAnimation for the "Real-time" feel
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            if isFavorite(quote) {
+                // Remove locally
+                favoriteQuotes.removeAll { $0.id == quote.id }
+                
+                // Sync with Database in background
+                Task { try? await QuoteService.shared.removeFavorite(quoteId: quoteId, userId: userId) }
+            } else {
+                // Add locally
+                favoriteQuotes.append(quote)
+                
+                // Sync with Database in background
+                Task { try? await QuoteService.shared.addFavorite(quoteId: quoteId, userId: userId) }
             }
         }
     }
     
     func isFavorite(_ quote: Quote) -> Bool {
         return favoriteQuotes.contains(where: { $0.id == quote.id })
+    }
+    
+    func fetchQuoteOfTheDay() async {
+        do {
+            // 1. Fetch a pool of quotes (or all quotes)
+            let allQuotes: [Quote] = try await supabase
+                .from("quotes")
+                .select()
+                .execute()
+                .value
+            
+            if !allQuotes.isEmpty {
+                // 2. Use the current date to create a stable index
+                let calendar = Calendar.current
+                let dayOfYear = calendar.ordinality(of: .day, in: .year, for: Date()) ?? 0
+                
+                // 3. Pick a quote based on the day (it will be the same all day)
+                let index = dayOfYear % allQuotes.count
+                self.quoteOfTheDay = allQuotes[index]
+            }
+        } catch {
+            print("Error fetching daily quote: \(error)")
+        }
+    }
+    
+    func fetchBookmarkedStatus() async {
+        do {
+            // We only need the quote_ids from the collection_items table
+            struct BookmarkResponse: Decodable { let quote_id: Int }
+            
+            let response: [BookmarkResponse] = try await supabase
+                .from("collection_items")
+                .select("quote_id")
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                self.bookmarkedQuoteIds = Set(response.map { $0.quote_id })
+            }
+        } catch {
+            print("Error fetching bookmarks: \(error)")
+        }
+    }
+    
+    func refreshBookmarks() {
+        Task {
+            await fetchBookmarkedStatus()
+        }
     }
 }
