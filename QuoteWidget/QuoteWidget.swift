@@ -140,30 +140,69 @@ struct Provider: TimelineProvider {
         completion(entry)
     }
 
+//    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+//        Task {
+//            do {
+//                // Fetch from daily_wisdom to match the App's Hero section
+////                let dailyQuotes: [WidgetQuote] = try await supabase
+////                    .from("daily_wisdom")
+////                    .select("content, author")
+////                    .limit(1)
+////                    .execute()
+////                    .value
+//                let dailyQuotes: [WidgetQuote] = try await supabase
+//                    .from("quotes") // ✅ Use your existing 'quotes' table
+//                    .select("content, author")
+//                    .limit(1)
+//                    .execute()
+//                    .value
+//                let quoteToShow = dailyQuotes.first ?? WidgetQuote(content: "Stay hungry, stay foolish", author: "Steve Jobs")
+//                
+//                // Rotate themes to satisfy the "2 Additional Themes" requirement
+//                let themes: [WidgetTheme] = [.classic, .midnight, .nature]
+//                let dayIndex = Calendar.current.component(.day, from: Date()) % themes.count
+//                
+////                let entry = SimpleEntry(date: Date(), quote: quoteToShow, theme: themes[dayIndex])
+//                let entry = SimpleEntry(date: Date(), quote: quoteToShow, theme: .classic)
+//                
+//                // Refresh at midnight
+//                let nextUpdate = Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400)
+//                completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+//            } catch {
+//                // Add these two lines to see the REAL error in the Xcode Console
+//                    print("❌ WIDGET FETCH ERROR: \(error.localizedDescription)")
+//                    print("❌ FULL ERROR: \(error)")
+//                
+//                let errorEntry = SimpleEntry(date: Date(), quote: WidgetQuote(content: "Check connection for wisdom.", author: "Daily Wisdom"), theme: .classic)
+//                completion(Timeline(entries: [errorEntry], policy: .after(Date().addingTimeInterval(3600))))
+//            }
+//        }
+//    }
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         Task {
             do {
-                // Fetch from daily_wisdom to match the App's Hero section
-                let dailyQuotes: [WidgetQuote] = try await supabase
-                    .from("daily_wisdom")
+                // 1. Fetch the exact same pool of quotes as the app
+                let allQuotes: [WidgetQuote] = try await supabase
+                    .from("quotes")
                     .select("content, author")
-                    .limit(1)
                     .execute()
                     .value
                 
-                let quoteToShow = dailyQuotes.first ?? WidgetQuote(content: "Stay hungry, stay foolish", author: "Steve Jobs")
-                
-                // Rotate themes to satisfy the "2 Additional Themes" requirement
-                let themes: [WidgetTheme] = [.classic, .midnight, .nature]
-                let dayIndex = Calendar.current.component(.day, from: Date()) % themes.count
-                
-                let entry = SimpleEntry(date: Date(), quote: quoteToShow, theme: themes[dayIndex])
-                
-                // Refresh at midnight
-                let nextUpdate = Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400)
-                completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+                if !allQuotes.isEmpty {
+                    // 2. Use the EXACT same index logic as your ViewModel
+                    let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 0
+                    let index = dayOfYear % allQuotes.count
+                    let quoteToShow = allQuotes[index]
+                    
+                    // 3. Create the entry with the synced quote
+                    let entry = SimpleEntry(date: Date(), quote: quoteToShow, theme: .classic)
+                    
+                    // Refresh exactly at midnight to stay in sync
+                    let nextUpdate = Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400)
+                    completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+                }
             } catch {
-                let errorEntry = SimpleEntry(date: Date(), quote: WidgetQuote(content: "Check connection for wisdom.", author: "Daily Wisdom"), theme: .classic)
+                let errorEntry = SimpleEntry(date: Date(), quote: WidgetQuote(content: "Refresh for today's wisdom.", author: "Daily Quote"), theme: .classic)
                 completion(Timeline(entries: [errorEntry], policy: .after(Date().addingTimeInterval(3600))))
             }
         }
@@ -189,44 +228,77 @@ struct SimpleEntry: TimelineEntry {
     let theme: WidgetTheme
 }
 
+//struct QuoteWidgetEntryView : View {
+//    var entry: Provider.Entry
+//
+//    var body: some View {
+//        if #available(iOS 17.0, *) {
+//            VStack(alignment: .leading, spacing: 8) {
+//                Image(systemName: "quote.opening")
+//                    .foregroundColor(entry.theme.accentColor)
+//                    .font(.caption)
+//                
+//                Text(entry.quote.content)
+//                    .font(.system(size: 14, weight: .medium, design: .serif))
+//                    .foregroundColor(entry.theme.textColor)
+//                    .minimumScaleFactor(0.8)
+//                    .lineLimit(4)
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//                
+//                Spacer()
+//                
+//                Text("- \(entry.quote.author)")
+//                    .font(.caption2)
+//                    .foregroundColor(entry.theme.textColor.opacity(0.7))
+//                    .italic()
+//            }
+//            .padding()
+//            // Using a @ViewBuilder closure to return specific ShapeStyles
+//            .containerBackground(for: .widget) {
+//                switch entry.theme {
+//                case .classic:
+//                    Color(red: 0.96, green: 0.97, blue: 0.97)
+//                case .midnight:
+//                    Color.black
+//                case .nature:
+//                    LinearGradient(colors: [.green, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
+//                }
+//            }
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//    }
+//}
+
 struct QuoteWidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
         if #available(iOS 17.0, *) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) { // Reduced spacing
                 Image(systemName: "quote.opening")
                     .foregroundColor(entry.theme.accentColor)
-                    .font(.caption)
+                    .font(.system(size: 10)) // Smaller icon
                 
                 Text(entry.quote.content)
                     .font(.system(size: 14, weight: .medium, design: .serif))
                     .foregroundColor(entry.theme.textColor)
-                    .minimumScaleFactor(0.8)
-                    .lineLimit(4)
+                    .minimumScaleFactor(0.5) // 👈 Allows the font to shrink to fit the whole quote
+                    .lineLimit(6)            // 👈 Allows more lines than the default
+                    .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Spacer()
+                Spacer(minLength: 2)
                 
                 Text("- \(entry.quote.author)")
-                    .font(.caption2)
-                    .foregroundColor(entry.theme.textColor.opacity(0.7))
-                    .italic()
+                    .font(.system(size: 10, weight: .bold)) // Smaller author text
+                    .foregroundColor(entry.theme.textColor.opacity(0.8))
+                    .lineLimit(1)
             }
-            .padding()
-            // Using a @ViewBuilder closure to return specific ShapeStyles
+            .padding(12) // Slightly smaller padding to give text more room
             .containerBackground(for: .widget) {
-                switch entry.theme {
-                case .classic:
-                    Color(red: 0.96, green: 0.97, blue: 0.97)
-                case .midnight:
-                    Color.black
-                case .nature:
-                    LinearGradient(colors: [.green, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)
-                }
+                // ... your existing background code ...
             }
-        } else {
-            // Fallback on earlier versions
         }
     }
 }

@@ -210,6 +210,7 @@ class QuoteViewModel: ObservableObject {
         Task {
             await fetchQuotes() // Initial fetch
             await loadFavorites()
+            await fetchQuoteOfTheDay()
         }
     }
     
