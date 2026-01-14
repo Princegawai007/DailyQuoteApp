@@ -4,9 +4,6 @@
 //
 //  Created by Prince Gawai on 13/01/26.
 //
-// File: DailyQuoteApp/Views/Main/CollectionsListView.swift
-// File: DailyQuoteApp/Views/Main/CollectionsListView.swift
-// File: DailyQuoteApp/Views/Main/CollectionsListView.swift
 import SwiftUI
 
 struct CollectionsListView: View {
@@ -26,7 +23,7 @@ struct CollectionsListView: View {
                         .font(.footnote)
                 }
             }
-
+            
             if viewModel.collections.isEmpty && !viewModel.isLoading {
                 Text("No collections yet. Create one!")
                     .foregroundColor(.gray)

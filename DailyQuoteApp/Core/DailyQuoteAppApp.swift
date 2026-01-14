@@ -3,25 +3,7 @@
 //  DailyQuoteApp
 //
 //  Created by Prince Gawai on 12/01/26.
-//
-//
-//import SwiftUI
-//
-//@main
-//struct DailyQuoteAppApp: App {
-//    @StateObject private var authService = AuthService.shared
-//    
-//    var body: some Scene {
-//        WindowGroup {
-//            if authService.userSession != nil {
-//                MainTabView() // The main app
-//            } else {
-//                LoginView()   // The login screen
-//            }
-//        }
-//    }
-//}
-//
+
 import SwiftUI
 
 @main

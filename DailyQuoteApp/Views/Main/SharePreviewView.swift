@@ -12,7 +12,7 @@ struct SharePreviewView: View {
     @State private var selectedTheme: QuoteTheme = .minimal
     @Environment(\.dismiss) var dismiss
     @Binding var shareItem: ShareableImage?
-
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 30) {
@@ -22,7 +22,7 @@ struct SharePreviewView: View {
                     .shadow(radius: 10)
                     .scaleEffect(0.7) // Scale down to fit screen
                     .frame(height: 350)
-
+                
                 // Theme Selector
                 // --- THE THEME PICKER ---
                 HStack(spacing: 25) {
@@ -34,7 +34,7 @@ struct SharePreviewView: View {
                             selectedTheme = theme
                         }) {
                             Circle()
-                                // Use theme directly, not $theme
+                            // Use theme directly, not $theme
                                 .fill(LinearGradient(colors: theme.backgroundColors, startPoint: .top, endPoint: .bottom))
                                 .frame(width: 50, height: 50)
                                 .overlay(
@@ -70,7 +70,7 @@ struct SharePreviewView: View {
             }
         }
     }
-
+    
     @available(iOS 16.0, *)
     @MainActor
     private func generateImage() {
@@ -81,7 +81,7 @@ struct SharePreviewView: View {
             dismiss()
         }
     }
-
+    
     // Reuse your renderView logic here
     private func renderView(for quote: Quote, theme: QuoteTheme) -> some View {
         VStack(spacing: 20) {

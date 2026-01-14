@@ -13,67 +13,54 @@ struct CollectionDetailView: View {
     @State private var savedQuotes: [Quote] = []
     @State private var isLoading = true
     
-//    var body: some View {
-//        VStack {
-//            if isLoading {
-//                ProgressView()
-//            } else if savedQuotes.isEmpty {
-//                VStack(spacing: 20) {
-//                    Image(systemName: "folder.badge.questionmark")
-//                        .font(.largeTitle)
-//                        .foregroundColor(.gray)
-//                    Text("No quotes in this collection yet.")
-//                        .foregroundColor(.gray)
-//                }
-//            } else {
-//                List(savedQuotes) { quote in
-//                    VStack(alignment: .leading, spacing: 10) {
-//                        Text("“\(quote.content)”")
-//                            .font(.system(.body, design: .serif))
-//                            .fontWeight(.medium)
-//                        Text("- \(quote.author)")
-//                            .font(.caption)
-//                            .italic()
-//                            .foregroundColor(.gray)
-//                    }
-//                    .padding(.vertical, 8)
-//                    .onDelete(perform: deleteQuote)
-//                }
-//            }
-//        }
-//        .navigationTitle(collection.title)
-//        .onAppear {
-//            fetchSavedQuotes()
-//        }
-//    }
     var body: some View {
-        VStack {
-            if isLoading {
-                ProgressView()
-            } else if savedQuotes.isEmpty {
-                VStack(spacing: 20) {
-                    Image(systemName: "folder.badge.questionmark")
-                        .font(.largeTitle)
-                        .foregroundColor(.gray)
-                    Text("No quotes in this collection yet.")
-                        .foregroundColor(.gray)
-                }
-            } else {
-                List {
-                    // IMPORTANT: .onDelete MUST be attached to ForEach
-                    ForEach(savedQuotes) { quote in
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("“\(quote.content)”")
-                                .font(.system(.body, design: .serif))
-                                .fontWeight(.medium)
-                            Text("- \(quote.author)")
-                                .font(.caption)
-                                .italic()
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.vertical, 8)
+        ZStack { // 1. Main container for layering
+            // 2. The shared animated background
+            AnimatedGradientView()
+                .ignoresSafeArea()
+            
+            VStack {
+                if isLoading {
+                    ProgressView()
+                        .tint(.primary) // Ensures visibility on colored backgrounds
+                } else if savedQuotes.isEmpty {
+                    // Empty State
+                    VStack(spacing: 20) {
+                        Image(systemName: "folder.badge.questionmark")
+                            .font(.largeTitle)
+                            .foregroundColor(.secondary) // Adaptive color looks better on gradients
+                        Text("No quotes in this collection yet.")
+                            .foregroundColor(.secondary)
                     }
-                    .onDelete(perform: deleteQuote) // This now works!
+                    .padding()
+                    // Optional: Adds a subtle frosted glass effect behind the empty message
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(16)
+                } else {
+                    // Content List
+                    if #available(iOS 16.0, *) {
+                        List {
+                            ForEach(savedQuotes) { quote in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("“\(quote.content)”")
+                                        .font(.system(.body, design: .serif))
+                                        .fontWeight(.medium)
+                                    Text("- \(quote.author)")
+                                        .font(.caption)
+                                        .italic()
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.vertical, 8)
+                                // 3. Semi-transparent card style for rows
+                                .listRowBackground(Color(uiColor: .systemBackground).opacity(0.8))
+                            }
+                            .onDelete(perform: deleteQuote)
+                        }
+                        // 4. Hides the default opaque list background
+                        .scrollContentBackground(.hidden)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }
@@ -86,20 +73,17 @@ struct CollectionDetailView: View {
     func fetchSavedQuotes() {
         Task {
             do {
-                // 1. We fetch the 'collection_items' and ask Supabase to
-                //    automatically join the 'quotes' table to get the actual content.
                 struct ItemResponse: Decodable {
-                    let quotes: Quote // Nested quote object
+                    let quotes: Quote
                 }
                 
                 let items: [ItemResponse] = try await supabase
                     .from("collection_items")
-                    .select("quotes(*)") // <--- The Magic Join
+                    .select("quotes(*)")
                     .eq("collection_id", value: collection.id)
                     .execute()
                     .value
                 
-                // 2. Unwrap the nested quotes into a flat array
                 DispatchQueue.main.async {
                     self.savedQuotes = items.map { $0.quotes }
                     self.isLoading = false
@@ -110,8 +94,7 @@ struct CollectionDetailView: View {
             }
         }
     }
-    // Inside CollectionDetailView.swift
-
+    
     private func deleteQuote(at offsets: IndexSet) {
         offsets.forEach { index in
             let quoteToDelete = savedQuotes[index]
@@ -128,7 +111,9 @@ struct CollectionDetailView: View {
                     
                     // Remove from local UI list
                     DispatchQueue.main.async {
-                        savedQuotes.remove(at: index)
+                        if savedQuotes.indices.contains(index) {
+                            savedQuotes.remove(at: index)
+                        }
                     }
                 } catch {
                     print("Error removing bookmark: \(error)")

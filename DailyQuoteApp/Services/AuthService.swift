@@ -25,19 +25,17 @@ class AuthService: ObservableObject {
     }
     
     // Sign Up Function
+    
+    func signUp(email: String, password: String, fullName: String) async throws {
+        // Create the metadata dictionary
+        let metadata: [String: AnyJSON] = ["full_name": .string(fullName)]
         
-        func signUp(email: String, password: String, fullName: String) async throws {
-            // Create the metadata dictionary
-            let metadata: [String: AnyJSON] = ["full_name": .string(fullName)]
-            
-            // Pass metadata during sign up
-            // Note: Depending on your exact SDK version, this parameter might be named 'data' or 'userMetadata'
-            try await supabase.auth.signUp(
-                email: email,
-                password: password,
-                data: metadata
-            )
-        }
+        try await supabase.auth.signUp(
+            email: email,
+            password: password,
+            data: metadata
+        )
+    }
     
     // Sign In Function
     func signIn(email: String, password: String) async throws {
@@ -54,22 +52,19 @@ class AuthService: ObservableObject {
             self.userSession = nil
         }
     }
-    // Add this inside AuthService class
-        func sendPasswordReset(email: String) async throws {
-            // This triggers the standard Supabase reset email
-            try await supabase.auth.resetPasswordForEmail(email)
-        }
-    // Add this to AuthService.swift
-        func handleIncomingURL(_ url: URL) async throws {
-            // This passes the deep link (password reset/email confirm) to Supabase
-            try await supabase.auth.session(from: url)
-        }
-    // Add to AuthService.swift
-    // In AuthService.swift
-        func updateUserFullName(_ name: String) async throws {
-            let updates = UserAttributes(data: ["full_name": .string(name)])
-            
-            // FIX: Use 'update' instead of 'updateUser'
-            try await supabase.auth.update(user: updates)
-        }
+    func sendPasswordReset(email: String) async throws {
+        // This triggers the standard Supabase reset email
+        try await supabase.auth.resetPasswordForEmail(email)
+    }
+    func handleIncomingURL(_ url: URL) async throws {
+        // This passes the deep link (password reset/email confirm) to Supabase
+        try await supabase.auth.session(from: url)
+    }
+    
+    func updateUserFullName(_ name: String) async throws {
+        let updates = UserAttributes(data: ["full_name": .string(name)])
+        
+        // FIX: Use 'update' instead of 'updateUser'
+        try await supabase.auth.update(user: updates)
+    }
 }

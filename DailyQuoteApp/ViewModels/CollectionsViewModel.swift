@@ -5,7 +5,6 @@
 //  Created by Prince Gawai on 13/01/26.
 //
 
-// File: DailyQuoteApp/ViewModels/CollectionsViewModel.swift
 import Foundation
 import Supabase
 import Combine
@@ -15,7 +14,7 @@ class CollectionsViewModel: ObservableObject {
     @Published var collections: [QuoteCollection] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
-
+    
     // 1. Fetch all collections for the user
     func fetchCollections() async {
         self.isLoading = true
@@ -37,7 +36,7 @@ class CollectionsViewModel: ObservableObject {
             self.isLoading = false
         }
     }
-
+    
     // 2. Create a new collection (e.g., "Morning Motivation")
     func createCollection(title: String) async {
         do {
@@ -63,26 +62,6 @@ class CollectionsViewModel: ObservableObject {
         }
     }
     
-    // 3. Add a quote to a specific collection
-//    func addQuoteToCollection(collectionId: UUID, quoteId: Int) async {
-//        do {
-//            struct CollectionItem: Encodable {
-//                let collection_id: UUID
-//                let quote_id: Int
-//            }
-//            
-//            let item = CollectionItem(collection_id: collectionId, quote_id: quoteId)
-//            
-//            try await supabase
-//                .from("collection_items")
-//                .insert(item)
-//                .execute()
-//                
-//            print("Quote added to collection!")
-//        } catch {
-//            print("Error adding quote: \(error)")
-//        }
-//    }
     func addQuoteToCollection(collectionId: UUID, quoteId: Int) async {
         do {
             // 1. Create an instance of our save model
@@ -112,8 +91,7 @@ class CollectionsViewModel: ObservableObject {
             print("Error adding quote: \(error)")
         }
     }
-    // File: DailyQuoteApp/ViewModels/CollectionsViewModel.swift
-
+    
     func deleteCollection(id: UUID) async {
         do {
             // 1. Tell Supabase to delete the row with this ID

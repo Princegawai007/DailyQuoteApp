@@ -5,8 +5,6 @@
 //  Created by Prince Gawai on 13/01/26.
 //
 
-// File: DailyQuoteApp/Views/Main/LibraryView.swift
-// File: DailyQuoteApp/Views/Main/LibraryView.swift
 import SwiftUI
 
 struct LibraryView: View {
@@ -17,46 +15,62 @@ struct LibraryView: View {
     @State private var newCollectionName = ""
     
     var body: some View {
-        List {
-            // SECTION 1: SYSTEM FAVORITES
-            Section(header: Text("Saved Content").font(.subheadline).fontWeight(.semibold)) {
-                NavigationLink(destination: FavoritesDetailView(viewModel: quotesVM)) {
-                    HStack(spacing: 15) {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(Color.green)
-                            .font(.system(size: 18))
-                        Text("Favorites")
-                            .font(.body) // This matches the system font perfectly
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
+        ZStack { // 1. Wrap in ZStack
+            // 2. Add the shared background
+            AnimatedGradientView()
+                .ignoresSafeArea()
             
-            // SECTION 2: CUSTOM COLLECTIONS
-            Section(header: Text("My Collections").font(.subheadline).fontWeight(.semibold)) {
-                if collectionsVM.collections.isEmpty && !collectionsVM.isLoading {
-                    Text("No folders yet. Tap + to create one.")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                        .padding(.vertical, 8)
-                }
-                
-                ForEach(collectionsVM.collections) { collection in
-                    NavigationLink(destination: CollectionDetailView(collection: collection)) {
-                        HStack(spacing: 15) {
-                            Image(systemName: "folder.fill")
-                                .foregroundColor(.green)
-                                .font(.system(size: 18))
-                            Text(collection.title)
-                                .font(.body)
+            if #available(iOS 16.0, *) {
+                List {
+                    // SECTION 1: SYSTEM FAVORITES
+                    Section(header: Text("Saved Content").font(.subheadline).fontWeight(.semibold)) {
+                        NavigationLink(destination: FavoritesDetailView(viewModel: quotesVM)) {
+                            HStack(spacing: 15) {
+                                Image(systemName: "heart.fill")
+                                    .foregroundColor(Color.green)
+                                    .font(.system(size: 18))
+                                Text("Favorites")
+                                    .font(.body)
+                            }
+                            .padding(.vertical, 4)
                         }
-                        .padding(.vertical, 4)
                     }
+                    // Make section backgrounds transparent to show gradient (Optional, purely aesthetic)
+                    .listRowBackground(Color(uiColor: .systemBackground).opacity(0.8))
+                    
+                    // SECTION 2: CUSTOM COLLECTIONS
+                    Section(header: Text("My Collections").font(.subheadline).fontWeight(.semibold)) {
+                        if collectionsVM.collections.isEmpty && !collectionsVM.isLoading {
+                            Text("No folders yet. Tap + to create one.")
+                                .font(.callout)
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, 8)
+                                .listRowBackground(Color.clear) // Clear background for empty text
+                        }
+                        
+                        ForEach(collectionsVM.collections) { collection in
+                            NavigationLink(destination: CollectionDetailView(collection: collection)) {
+                                HStack(spacing: 15) {
+                                    Image(systemName: "folder.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 18))
+                                    Text(collection.title)
+                                        .font(.body)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                        }
+                        .onDelete(perform: deleteCollection)
+                    }
+                    // Make collection rows slightly transparent
+                    .listRowBackground(Color(uiColor: .systemBackground).opacity(0.8))
                 }
-                .onDelete(perform: deleteCollection)
-            }
+                .scrollContentBackground(.hidden)
+            } else {
+                // Fallback on earlier versions
+            } // 3. IMPORTANT: Hides the default flat white list background
         }
-        .navigationTitle("Library") // This creates the large, standard system title
+        .navigationTitle("Library")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showingAddAlert = true }) {
@@ -80,17 +94,12 @@ struct LibraryView: View {
         }
     }
     
-    // Optional: Add delete logic
-    // File: DailyQuoteApp/Views/Main/LibraryView.swift
-
     private func deleteCollection(at offsets: IndexSet) {
-        // 1. Find the collection(s) being swiped
         offsets.forEach { index in
             let collection = collectionsVM.collections[index]
-            
-            // 2. Call the ViewModel to delete from Supabase
             Task {
                 await collectionsVM.deleteCollection(id: collection.id)
             }
         }
-    }}
+    }
+}

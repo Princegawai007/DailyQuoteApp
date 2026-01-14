@@ -5,7 +5,6 @@
 //  Created by Prince Gawai on 13/01/26.
 //
 
-// File: DailyQuoteApp/Models/Collection.swift
 import Foundation
 
 struct QuoteCollection: Identifiable, Codable {

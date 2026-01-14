@@ -5,7 +5,6 @@
 //  Created by Prince Gawai on 13/01/26.
 //
 
-// File: DailyQuoteApp/Views/Main/AddToCollectionView.swift
 import SwiftUI
 
 struct AddToCollectionView: View {
